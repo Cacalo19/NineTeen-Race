@@ -7,7 +7,8 @@ from code.Menu import Menu
 class Game:
     def __init__(self):
         pygame.init()
-        #self.window = window
+        
+
         self.window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.clock = pygame.time.Clock()
 
@@ -39,6 +40,10 @@ class Game:
 
     def run(self):
             running = True
+
+            pygame.mixer_music.load('./asset/som/racing_game_title_bpm140.mp3')
+            pygame.mixer_music.play(-1)
+
             while running:
                 # Captura o tempo atual para o controle do Splash
                 
@@ -74,10 +79,14 @@ class Game:
                         self.window.blit(self.surf_texto_space, self.rect_texto_space)
                     
                 elif self.estado == "MENU":
+                    pygame.mixer_music.load('./asset/som/racing_game_menu.mp3')
+                    pygame.mixer_music.play(-1)
                     menu = Menu(self.window)
                     escolha = menu.run() 
                     
                     if escolha == "INICIAR":
+                        #pygame.mixer_music.load('./asset/som/musica.mp3')
+                        #pygame.mixer_music.play(-1)
                         self.estado = "LEVEL"
                     elif escolha == "SAIR" or escolha == None:
                         running = False
