@@ -1,15 +1,16 @@
 import pygame
 
-from code.Constante import COR_BRANCA, MENU_OPCOES, WINDOW_WIDTH
+from code.Constante import COR_AZUL, COR_BRANCA, MENU_OPCOES, WINDOW_WIDTH
 
 
 class Menu:
     def __init__(self, window):
         self.window = window
-        self.surf = pygame.image.load('./asset/imagem/Menu.png').convert_alpha()
+        self.surf = pygame.image.load('./asset/imagem/menu.png').convert_alpha()
         self.rect = self.surf.get_rect()
 
     def run(self):
+        menu_opcoes = 0
         #pygame.mixer.music.load('./asset/som/racing_game_menu.mp3')
         #pygame.mixer.music.play(-1)
 
@@ -18,13 +19,12 @@ class Menu:
 
             self.window.blit(self.surf, self.rect)
 
-            #self.menu_text('START', 50, COR_BRANCA, WINDOW_WIDTH // 2, 930)
-            #self.menu_text('SCORE', 50, (COR_BRANCA), WINDOW_WIDTH // 2, 1050)
-            #self.menu_text('EXIT', 50, (COR_BRANCA), WINDOW_WIDTH // 2, 1170)
-
             for i in range(len(MENU_OPCOES)):
-                self.menu_text(MENU_OPCOES[i], 50, COR_BRANCA, WINDOW_WIDTH // 2, 930 + 120 * i)
-            
+                if i == menu_opcoes:
+                    self.menu_text(MENU_OPCOES[i], 45, COR_AZUL, WINDOW_WIDTH // 2, 925 + 120 * i)
+                else:
+                    self.menu_text(MENU_OPCOES[i], 45, COR_BRANCA, WINDOW_WIDTH // 2, 925 + 120 * i)
+                        
             pygame.display.flip()
 
             # Check todos os os eventos
@@ -32,6 +32,23 @@ class Menu:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     quit()
+
+                # Navegação do menu
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_DOWN:
+                        if menu_opcoes < len(MENU_OPCOES) - 1:
+                            menu_opcoes += 1
+                        else:
+                            menu_opcoes = 0
+                    
+                    if event.key == pygame.K_UP:
+                        if menu_opcoes > 0:
+                            menu_opcoes -= 1
+                        else:
+                            menu_opcoes = len(MENU_OPCOES) - 1
+                    
+                    if event.key == pygame.K_RETURN:
+                        return MENU_OPCOES[menu_opcoes]
 
     def menu_text(self, text, font_size, color, x, y):
 
@@ -50,12 +67,6 @@ class Menu:
             outline_rect = outline_surf.get_rect(center=(x + ox, y + oy))
             self.window.blit(outline_surf, outline_rect)
 
-
-        # Efeito de sombra (opcional)
-        #shadow_color = (20, 20, 20)  # Cor escura para a sombra
-        #shadow_surface = font.render(text, True, shadow_color) # Cor escura
-        #shadow_rect = shadow_surface.get_rect(center=(x + 6, y + 6))
-        #self.window.blit(shadow_surface, shadow_rect)
 
         # Texto principal
         text_surface = font.render(text, True, color)
