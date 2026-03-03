@@ -11,11 +11,8 @@ class Menu:
 
     def run(self):
         menu_opcoes = 0
-        #pygame.mixer.music.load('./asset/som/racing_game_menu.mp3')
-        #pygame.mixer.music.play(-1)
 
-        while True:          
-
+        while True:
 
             self.window.blit(self.surf, self.rect)
 

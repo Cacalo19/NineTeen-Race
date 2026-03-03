@@ -1,6 +1,7 @@
 import pygame
 import sys
 
+from code.Level import Level
 from code.Constante import COR_BRANCA, WINDOW_HEIGHT, WINDOW_WIDTH
 from code.Menu import Menu
 
@@ -85,9 +86,14 @@ class Game:
                     escolha = menu.run() 
                     
                     if escolha == "INICIAR":
+                        level = Level(self.window, 'Level1')
+                        level.run()
                         #pygame.mixer_music.load('./asset/som/musica.mp3')
                         #pygame.mixer_music.play(-1)
                         self.estado = "LEVEL"
+                    elif escolha == 'RECORDES':
+                        pass
+
                     elif escolha == "SAIR" or escolha == None:
                         running = False
 
