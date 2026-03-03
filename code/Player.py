@@ -4,12 +4,12 @@ from code.Entity import Entity
 class Player(Entity):
     def __init__(self, name: str, position: tuple):
         super().__init__(name, position)
-        self.speed = 5
+        self.vel_horizontal = 5
         self.is_acelerando = False 
         self.current_speed = 0 # Começa parado
-        self.max_speed = 50   # Velocidade maxima
+        self.max_speed = 40   # Velocidade maxima
         self.acelerando = 0.1 # Quanho de velocidade
-        self.freiando = 0.6
+        self.freiando = 0.3
 
     def move(self):
         keys = pygame.key.get_pressed()
@@ -17,7 +17,7 @@ class Player(Entity):
         if keys[pygame.K_w]:
             self.is_acelerando = True
             if self.current_speed < self.max_speed:
-                self.current_speed += self.freiando
+                self.current_speed += self.acelerando
         else:
             self.is_acelerando = False
             if self.current_speed > 0:
@@ -27,9 +27,9 @@ class Player(Entity):
 
         
         if keys[pygame.K_a]:
-            self.rect.x -= self.speed
+            self.rect.x -= self.vel_horizontal
         if keys[pygame.K_d]:
-            self.rect.x += self.speed
+            self.rect.x += self.vel_horizontal
 
         # Impede o carro de sair pela esquerda
         if self.rect.left < 129:

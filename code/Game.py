@@ -86,10 +86,10 @@ class Game:
                     escolha = menu.run() 
                     
                     if escolha == "INICIAR":
+                        pygame.mixer_music.stop()
                         level = Level(self.window, 'Level1')
                         level.run()
-                        #pygame.mixer_music.load('./asset/som/musica.mp3')
-                        #pygame.mixer_music.play(-1)
+
                         self.estado = "LEVEL"
                     elif escolha == 'RECORDES':
                         pass

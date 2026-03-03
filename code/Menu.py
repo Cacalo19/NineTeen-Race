@@ -1,6 +1,6 @@
 import pygame
 
-from code.Constante import COR_AZUL, COR_BRANCA, MENU_OPCOES, WINDOW_WIDTH
+from code.Constante import COR_AZUL, COR_BRANCA, COR_PRETA, MENU_OPCOES, WINDOW_WIDTH, OFFSETS_BORDA
 
 
 class Menu:
@@ -55,9 +55,9 @@ class Menu:
             font = pygame.font.SysFont('Comic Sans MS', font_size, bold=True)
             print('Fonte personalizada não encontrada. Usando fonte padrão.')
 
-        outline_color = (0, 0, 0)  # Cor preta para a borda
+        outline_color = (COR_PRETA)  # Cor preta para a borda
 
-        offsets = [(-2, -2), (2, -2), (-2, 2), (2, 2)]  # Deslocamentos para criar a borda
+        offsets = (OFFSETS_BORDA)  # Deslocamentos para criar a borda
 
         for ox, oy in offsets:
             outline_surf = font.render(text, True, outline_color) # Cor preta
