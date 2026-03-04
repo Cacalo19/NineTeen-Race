@@ -16,9 +16,19 @@ FONTE_TAMANHA_PEQUENO = 40
 OFFSETS_BORDA = [(-3, -3), (3, -3), (-3, 3), (3, 3)]
 
 # M
+
 MENU_OPCOES = ('INICIAR', 
                'RECORDES', 
                'SAIR')
+
+# V
+
+VELOCIDADE_VEICULOS = {
+    'carro-caminhao' : 20,
+    'carro-lento' : 25,
+    'carro-padrao' : 30,
+    'carro-esportivo' : 35,
+}
 
 # W
 

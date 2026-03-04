@@ -1,5 +1,8 @@
+import random 
+
 import pygame
 
+from code.Traffic import Traffic
 from code.Background import Background
 from code.EntityFactory import EntityFactory
 from code.Constante import COR_AMARELA, COR_VERDE, COR_PRETA, OFFSETS_BORDA
@@ -27,11 +30,14 @@ class Level:
         except:
             self.fonte_contagem = pygame.font.SysFont('Arial', 80, bold=True)
 
-        self.player = EntityFactory.get_entity('Player', (350, 950))
+        self.player = EntityFactory.get_entity('Player', (320, 950))
         self.bg = EntityFactory.get_entity('Level1', (0, 0))
 
         if self.bg: self.entity_list.append(self.bg)
         if self.player: self.entity_list.append(self.player)
+
+        self.timer_spawn = 0
+        self.spawn_delay = 1500
 
     def draw_text_with_outline(self, text, color, x, y):
         outline_color = (COR_PRETA)
@@ -84,16 +90,23 @@ class Level:
                     if event.key == pygame.K_ESCAPE:
                         return
             
-            # Movimentação
-            if self.corrida_iniciada:
-                if self.player:
+            # Movimentação Player
+            # if self.corrida_iniciada:
+            #     if self.player:
+            #         self.player.move()
+
+                    # for ent in self.entity_list:
+                    #     if isinstance(ent, Background):
+                    #         ent.move(self.player.current_speed)
+                    #     elif ent != self.player:
+                    #         ent.move()
+            if self.corrida_iniciada and self.player:
                     self.player.move()
 
-                    for ent in self.entity_list:
-                        if isinstance(ent, Background):
-                            ent.move(self.player.current_speed)
-                        elif ent != self.player:
-                            ent.move()
+            for ent in self.entity_list:
+                # Se for o Fundo ou um Carro da CPU, eles dependem da velocidade do Player
+                if isinstance(ent, Background) or isinstance(ent, Traffic):
+                    ent.move(self.player.current_speed)
 
             # Desenho
             self.window.fill((0, 0, 0))
@@ -117,5 +130,33 @@ class Level:
                 
                 self.draw_text_with_outline(texto_str, cor, self.window.get_width()/2, self.window.get_height()/2)
             
+            # Loop de spawn dos veiculos
+            if self.corrida_iniciada:
+                agora = pygame.time.get_ticks()
+                tempo_decorrida = agora - self.go_timer # Tempo desde o  GO
 
+                # Spawna veiculos apos 2 segundos de corrida
+                if tempo_decorrida > 2000:
+                    if agora - self.timer_spawn > self.spawn_delay:
+                        # 1. Sorteia um dos nomes que estão no match da Factory
+                        tipo_sorteado = random.choice(['carro-caminhao', 'carro-lento', 'carro-padrao', 'carro-esportivo'])
+                                
+                        # 3. Usa a Factory para criar
+                        novo_inimigo = EntityFactory.get_entity(tipo_sorteado)
+                
+                        # 4. Adiciona na lista de entidades do level
+                        if novo_inimigo:
+                            self.entity_list.append(novo_inimigo)
+                        
+                        self.timer_spawn = agora
+            # --- Movimentação das CPUs ---
+            # Você precisa chamar o move() deles passando a velocidade do player
+            for ent in self.entity_list:
+                if isinstance(ent, Traffic):
+                    ent.move(self.player.current_speed)
+                elif isinstance(ent, Background):
+                    ent.move(self.player.current_speed)
+
+            #self.entity_list = [ent for ent in self.entity_list if ent.alive()]
+            self.entity_list = [ent for ent in self.entity_list if not isinstance(ent, Traffic) or ent.rect.y < 1200]
             pygame.display.flip()
