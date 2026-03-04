@@ -14,11 +14,12 @@ class Level:
         self.name = name
 
         self.entity_list = []
-
+        
         self.contagem_regressiva = 3
         self.go_timer = 0
         self.timer_iniciar = pygame.time.get_ticks()
         self.corrida_iniciada = False
+        self.pausado = False
 
         self.mostrar_texto = True
         self.timer_piscar = pygame.time.get_ticks()
@@ -64,23 +65,17 @@ class Level:
                 if agora - self.timer_iniciar >= 1000:
                     self.contagem_regressiva -= 1
                     self.timer_iniciar = agora
-                    #Som de contagem
 
-                    #if self.contagem_regressiva > 0:
-                        #self.som_contagem.play()
-                    
                     if self.contagem_regressiva == 0:
-                        #self.som_contagem.stop()
                         self.corrida_iniciada = True
                         self.go_timer = agora
-                        #pygame.mixer_music.play(-1)
-                    
-                    if self.corrida_iniciada and not pygame.mixer.music.get_busy():
-                        # Se já passou 1 segundo (1000ms) do momento do GO!
-                        if agora - self.go_timer >= 1000:
-                            pygame.mixer.music.play(-1)
 
-            # Evento fechar a janela
+            # Iniciar Musica após o Go!       
+            if self.corrida_iniciada and not pygame.mixer.music.get_busy() and not self.pausado:
+                if agora - self.go_timer >= 1000:
+                    pygame.mixer.music.play(-1)
+
+            # Eventos Parte 1
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -88,26 +83,44 @@ class Level:
 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        return
-            
-            # Movimentação Player
-            # if self.corrida_iniciada:
-            #     if self.player:
-            #         self.player.move()
+                        self.pausado = not self.pausado
+                        if self.pausado:
+                            pygame.mixer.music.pause()
+                        else:
+                            pygame.mixer.music.unpause()
 
-                    # for ent in self.entity_list:
-                    #     if isinstance(ent, Background):
-                    #         ent.move(self.player.current_speed)
-                    #     elif ent != self.player:
-                    #         ent.move()
-            if self.corrida_iniciada and self.player:
+            # Evento Parte 2 Logica de movimento
+            if not self.pausado:               
+                if self.corrida_iniciada and self.player:
                     self.player.move()
 
-            for ent in self.entity_list:
-                # Se for o Fundo ou um Carro da CPU, eles dependem da velocidade do Player
-                if isinstance(ent, Background) or isinstance(ent, Traffic):
-                    ent.move(self.player.current_speed)
+                # Movimentação das CPUs e Fundo
+                for ent in self.entity_list: # Move o NPC
+                    # Se for o Fundo ou um Carro da CPU, eles dependem da velocidade do Player
+                    if isinstance(ent, Background) or isinstance(ent, Traffic):
+                        ent.move(self.player.current_speed)
 
+                # Spaw de veículos
+                if self.corrida_iniciada:
+                    agora = pygame.time.get_ticks()
+                    tempo_decorrida = agora - self.go_timer # Tempo desde o  GO
+                    if tempo_decorrida > 3000:
+                        if agora - self.timer_spawn > self.spawn_delay:
+                            tipo_sorteado = random.choice(['carro-caminhao', 'carro-lento', 'carro-padrao', 'carro-esportivo'])
+                            novo_inimigo = EntityFactory.get_entity(tipo_sorteado)
+                            if novo_inimigo:
+                                self.entity_list.append(novo_inimigo)                            
+                            self.timer_spawn = agora
+
+                # Você precisa chamar o move() deles passando a velocidade do player
+                for ent in self.entity_list:
+                    if isinstance(ent, Traffic):
+                        ent.move(self.player.current_speed)
+                    elif isinstance(ent, Background):
+                        ent.move(self.player.current_speed)
+                # Limpeza da lista
+                self.entity_list = [ent for ent in self.entity_list if not isinstance(ent, Traffic) or ent.rect.y < 1200]
+            
             # Desenho
             self.window.fill((0, 0, 0))
 
@@ -117,6 +130,7 @@ class Level:
                 else:
                     self.window.blit(ent.surf, ent.rect)
 
+            # Lógica do texto piscante
             if agora - self.timer_piscar > 500:
                 self.mostrar_texto = not self.mostrar_texto
                 self.timer_piscar = agora
@@ -130,33 +144,16 @@ class Level:
                 
                 self.draw_text_with_outline(texto_str, cor, self.window.get_width()/2, self.window.get_height()/2)
             
-            # Loop de spawn dos veiculos
-            if self.corrida_iniciada:
-                agora = pygame.time.get_ticks()
-                tempo_decorrida = agora - self.go_timer # Tempo desde o  GO
-
-                # Spawna veiculos apos 2 segundos de corrida
-                if tempo_decorrida > 2000:
-                    if agora - self.timer_spawn > self.spawn_delay:
-                        # 1. Sorteia um dos nomes que estão no match da Factory
-                        tipo_sorteado = random.choice(['carro-caminhao', 'carro-lento', 'carro-padrao', 'carro-esportivo'])
-                                
-                        # 3. Usa a Factory para criar
-                        novo_inimigo = EntityFactory.get_entity(tipo_sorteado)
+           # --- MENSAGEM DE PAUSE (Desenha por cima de tudo) ---
+            if self.pausado:
+                # Opcional: Escurece a tela ao pausar
+                overlay = pygame.Surface(self.window.get_size(), pygame.SRCALPHA)
+                overlay.fill((0, 0, 0, 150))
+                self.window.blit(overlay, (0, 0))
                 
-                        # 4. Adiciona na lista de entidades do level
-                        if novo_inimigo:
-                            self.entity_list.append(novo_inimigo)
-                        
-                        self.timer_spawn = agora
-            # --- Movimentação das CPUs ---
-            # Você precisa chamar o move() deles passando a velocidade do player
-            for ent in self.entity_list:
-                if isinstance(ent, Traffic):
-                    ent.move(self.player.current_speed)
-                elif isinstance(ent, Background):
-                    ent.move(self.player.current_speed)
+                self.draw_text_with_outline("PAUSADO", (255, 255, 255), self.window.get_width()/2, self.window.get_height()/2)
 
-            #self.entity_list = [ent for ent in self.entity_list if ent.alive()]
-            self.entity_list = [ent for ent in self.entity_list if not isinstance(ent, Traffic) or ent.rect.y < 1200]
+           
+
+            
             pygame.display.flip()
