@@ -1,6 +1,8 @@
 import pygame
 import sys
 
+from code.Score import Score
+
 from code.Level import Level
 from code.Constante import COR_BRANCA, WINDOW_HEIGHT, WINDOW_WIDTH
 from code.Menu import Menu
@@ -56,6 +58,7 @@ class Game:
                     
                     if self.estado == "TITLE" and event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_SPACE:
+                            pygame.mixer.music.stop()
                             self.estado = "MENU"
 
                 # 3. LÓGICA DE DESENHO (Usando os nomes certos)
@@ -80,25 +83,33 @@ class Game:
                         self.window.blit(self.surf_texto_space, self.rect_texto_space)
                     
                 elif self.estado == "MENU":
-                    pygame.mixer_music.load('./asset/som/racing_game_menu.mp3')
-                    pygame.mixer_music.play(-1)
+                    if not pygame.mixer.music.get_busy():
+                        pygame.mixer_music.load('./asset/som/racing_game_menu.mp3')
+                        pygame.mixer_music.play(-1)
                     menu = Menu(self.window)
                     escolha = menu.run() 
                     
                     if escolha == "INICIAR":
                         pygame.mixer_music.stop()
                         level = Level(self.window, 'Level1')
-                        level.run()
+                        #level.run()
+                        # Acrescentado
+                        pontos = level.run()
+                        Score.salvar_score(pontos)
+                        self.estado = 'MENU'
 
                         self.estado = "LEVEL"
                     elif escolha == 'RECORDES':
-                        pass
+                        Score.mostrar_score(self.window)
 
                     elif escolha == "SAIR" or escolha == None:
                         running = False
 
+            
+    
                 pygame.display.flip()
                 self.clock.tick(60) 
-
+            
+            
             pygame.quit()
-            sys.exit()
+            sys.exit()           

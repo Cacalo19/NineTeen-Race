@@ -26,6 +26,8 @@ class Level:
         self.som_contagem = pygame.mixer.Sound('./asset/som/countdown.ogg')
         pygame.mixer_music.load('./asset/som/neon_sign_circuit_bpm145.ogg')
 
+        self.pontuacao = 0
+
         try:
             self.fonte_contagem = pygame.font.Font('./asset/fonte/PressStart2P-Regular.ttf', 80)
         except:
@@ -39,6 +41,7 @@ class Level:
 
         self.timer_spawn = 0
         self.spawn_delay = 1500
+        self.score = 0
 
     def draw_text_with_outline(self, text, color, x, y):
         outline_color = (COR_PRETA)
@@ -54,9 +57,15 @@ class Level:
         text_rect = text_surf.get_rect(center=(x, y))
         self.window.blit(text_surf, text_rect)
 
+        fonte_hud = pygame.font.SysFont('Arial', 30, bold=True)
+        texto_surf = fonte_hud.render(f"PONTOS: {self.pontuacao}", True, (255, 255, 255))
+        self.window.blit(texto_surf, (20, 20)) # Desenha no canto superior esquerdo
+        
+
     def run(self, ):
         clock = pygame.time.Clock()
         self.som_contagem.play()
+
         while True:
             clock.tick(60)
             agora = pygame.time.get_ticks()
@@ -118,6 +127,17 @@ class Level:
                         ent.move(self.player.current_speed)
                     elif isinstance(ent, Background):
                         ent.move(self.player.current_speed)
+
+                #for ent in self.entity_list:
+                    #if isinstance(ent, Traffic) and ent.rect.y >= 1200:
+                        #self.score += 10
+                for ent in self.entity_list:
+                    # Verifica se é um carro da CPU (Traffic) e se ele passou do limite
+                    if isinstance(ent, Traffic) and ent.rect.y >= 1200:
+                        self.score += 100  # Aumenta para 100 pontos como você pediu
+                        #ent.kill()        # Remove o carro da lista na HORA para não contar ponto de novo
+                        print(f"Score atual: {self.score}")
+
                 # Limpeza da lista
                 self.entity_list = [ent for ent in self.entity_list if not isinstance(ent, Traffic) or ent.rect.y < 1200]
             
@@ -153,7 +173,6 @@ class Level:
                 
                 self.draw_text_with_outline("PAUSADO", (255, 255, 255), self.window.get_width()/2, self.window.get_height()/2)
 
-           
-
-            
             pygame.display.flip()
+
+        #return self.score
