@@ -42,7 +42,7 @@ class Level:
         if self.player: self.entity_list.append(self.player)
 
         self.timer_spawn = 0
-        self.spawn_delay = 1500        
+        self.spawn_delay = 1000       
 
     def draw_text_with_outline(self, text, color, x, y):
         outline_color = (COR_PRETA)
@@ -113,47 +113,72 @@ class Level:
                 if self.corrida_iniciada and self.player:
                     self.player.move()
 
-                    # 2. MOVIMENTAÇÃO DE ENTIDADES (CPU E FUNDO)
-                    for ent in self.entity_list: # Move o NPC
-                        # Se for o Fundo ou um Carro da CPU, eles dependem da velocidade do Player
-                        if isinstance(ent, Background) or isinstance(ent, Traffic):
+                    # 1. Filtra a lista de tráfego apenas UMA VEZ para a IA usar
+                    lista_trafego = [e for e in self.entity_list if isinstance(e, Traffic)]
+                    
+                    # 2. LOOP ÚNICO: Processa Movimento, IA, Pontuação e Remoção
+                    nova_lista = []
+                    for ent in self.entity_list:
+                        if isinstance(ent, (Background, Traffic)):
+                            # Move fundo e inimigos com base na velocidade do player
                             ent.move(self.player.current_speed)
+                            
+                            if isinstance(ent, Traffic):
+                                # Inteligência de desvio (executa apenas 30x por segundo para economizar CPU)
+                                if agora % 2 == 0:
+                                    ent.detectar_e_desviar(lista_trafego)
+                                
+                                # Pontuação: Se o carro saiu por baixo da tela
+                                if ent.rect.y >= 1200:
+                                    self.score += 10
+                                    continue # Pula o append: remove o carro da lista
+                        else:
+                            # Movimenta entidades que não dependem do player (como o próprio player se houver lógica interna)
+                            if ent != self.player: 
+                                ent.move()
 
-                    # 1. CHECAR COLISÃO (NOVO!)
+                        nova_lista.append(ent)
+                    
+                    self.entity_list = nova_lista
+                    ## MODIFICADO TESTE ##
+                    # --- LÓGICA DE DIFICULDADE (AJUSTE DINÂMICO) ---
+                    if self.score > 200:
+                        self.spawn_delay = 500  # 2 carros por segundo (mais difícil)
+                    elif self.score > 100:
+                        self.spawn_delay = 750  # ~1.3 carros por segundo
+                    else:
+                        self.spawn_delay = 1000 # 1 carro por segundo (inicial)
+
+                    # 3. SPAWN DE VEÍCULOS
+                    if self.corrida_iniciada:
+                        if agora - self.timer_spawn > self.spawn_delay:
+                            tipo_sorteado = random.choice(['carro-caminhao', 'carro-lento', 'carro-padrao', 'carro-esportivo'])
+                            
+                            # Sorteia um X (ajuste os números para as suas faixas de pista)
+                            x_aleatorio = random.randint(150, 600) 
+                            
+                            # O SEGREDO: Y = -200 para não dar "pop" na tela
+                            novo_inimigo = EntityFactory.get_entity(tipo_sorteado, (x_aleatorio, -200))
+                            
+                            if novo_inimigo:
+                                self.entity_list.append(novo_inimigo)
+                            self.timer_spawn = agora
+                    ## FIM ##
+                    # # 3. SPAWN DE VEÍCULOS
+                    # if agora - self.timer_spawn > self.spawn_delay:
+                    #     tipo_sorteado = random.choice(['carro-caminhao', 'carro-lento', 'carro-padrao', 'carro-esportivo'])
+                    #     novo_inimigo = EntityFactory.get_entity(tipo_sorteado)
+                    #     if novo_inimigo:
+                    #         self.entity_list.append(novo_inimigo)
+                    #     self.timer_spawn = agora
+
+                    # 4. CHECAR COLISÃO
                     if self.detectar_colisoes():
                         print(f"GAME OVER! Score Final: {self.score}")
                         pygame.mixer.music.stop()
-                        return self.score # Sai do Level e volta para o Game/Menu
+                        return self.score
 
                     
-                    # 3. SPAWN DE VEÍCULOS
-                    if self.corrida_iniciada:
-                        agora = pygame.time.get_ticks()
-                        tempo_decorrida = agora - self.go_timer # Tempo desde o  GO
-                        if tempo_decorrida > 3000:
-                            if agora - self.timer_spawn > self.spawn_delay:
-                                tipo_sorteado = random.choice(['carro-caminhao', 'carro-lento', 'carro-padrao', 'carro-esportivo'])
-                                novo_inimigo = EntityFactory.get_entity(tipo_sorteado)
-                                if novo_inimigo:
-                                    self.entity_list.append(novo_inimigo)                            
-                                self.timer_spawn = agora
-
-                    # Você precisa chamar o move() deles passando a velocidade do player
-                    for ent in self.entity_list:
-                        if isinstance(ent, Traffic):
-                            ent.move(self.player.current_speed)
-                        elif isinstance(ent, Background):
-                            ent.move(self.player.current_speed)
-
-                    # 4. SISTEMA de PONTUAÇÃO (Quando o carro sai da tela embaixo)       
-                    for ent in self.entity_list:
-                        # Verifica se é um carro da CPU (Traffic) e se ele passou do limite
-                        if isinstance(ent, Traffic) and ent.rect.y >= 1200:
-                            self.score += 10  # Aumenta para 10 pontos como você pediu
-                            print(f"Score atual: {self.score}")
-
-                    # 5 Limpeza da lista
-                    self.entity_list = [ent for ent in self.entity_list if not isinstance(ent, Traffic) or ent.rect.y < 1200]
                 
             # --- DESENHO (RENDERIZAÇÃO) ---
             self.window.fill((0, 0, 0))

@@ -11,13 +11,26 @@ class EntityFactory:
 
     @staticmethod
     def get_entity(entity_name: str, position=(0, 0)):
-        #x_aleatorio = random.randint(170, 670) # Limite da pista eicho x
-        faixas_x = [200, 340, 460, 600]
-        x_centralizado = random.choice(faixas_x)
-        y_topo = -50 # Spawn acima da tela no eicho y
-        #posicao_final = (x_aleatorio, y_topo)
-        posicao_final = (x_centralizado, y_topo)
 
+        # faixas_x = [200, 340, 460, 600]
+        # x_centralizado = random.choice(faixas_x)
+        # y_topo = -150 # Spawn acima da tela no eicho y
+
+        # posicao_final = (x_centralizado, y_topo)
+        ### Inicio do teste ###
+        if entity_name.startswith('carro'):
+            faixas_x = [200, 340, 460, 600]
+            x_escolhido = random.choice(faixas_x)
+            
+            # Se a posição enviada for (0,0), usamos o spawn padrão acima da tela
+            # Se enviamos algo como (x, -200) do Level.py, usamos o que foi enviado
+            y_spawn = position[1] if position[1] != 0 else -150
+            x_spawn = position[0] if position[0] != 0 else x_escolhido
+            
+            posicao_final = (x_spawn, y_spawn)
+        else:
+            posicao_final = position
+        ### Fim do teste ###
         match entity_name:
             case 'Level1':
                 return Background('pista1', position)

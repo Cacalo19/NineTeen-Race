@@ -10,9 +10,6 @@ class Entity(ABC):
         self.rect = self.surf.get_rect(left=position[0], top=position[1])
         self.speed = 0
 
-        #self.surf = surf
-        #self.rect = self.surf.get_rect(topleft=position)
-        # Adicione isso: Cria um mapa de pixels para colisão precisa
         self.mask = pygame.mask.from_surface(self.surf)
 
     @abstractmethod

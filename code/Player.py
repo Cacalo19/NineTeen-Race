@@ -8,8 +8,8 @@ class Player(Entity):
         self.is_acelerando = False 
         self.current_speed = 0 # Começa parado
         self.max_speed = 40   # Velocidade maxima
-        self.acelerando = 0.1 # Quanho de velocidade
-        self.freiando = 0.3
+        self.acelerando = 0.25 # Quanho de velocidade
+        self.freiando = 0.4
 
     def move(self):
         keys = pygame.key.get_pressed()
