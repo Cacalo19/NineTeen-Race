@@ -38,9 +38,6 @@ class Game:
         self.surf_titulo = pygame.image.load('asset/imagem/background_titulo.png').convert_alpha()
         self.rect_titulo = self.surf_titulo.get_rect(topleft=(0, 0))
 
-        
-
-
     def run(self):
             running = True
 
@@ -86,30 +83,54 @@ class Game:
                     if not pygame.mixer.music.get_busy():
                         pygame.mixer_music.load('./asset/som/racing_game_menu.mp3')
                         pygame.mixer_music.play(-1)
+                    
                     menu = Menu(self.window)
                     escolha = menu.run() 
                     
                     if escolha == "INICIAR":
                         pygame.mixer_music.stop()
                         level = Level(self.window, 'Level1')
-                        #level.run()
-                        # Acrescentado
                         pontos = level.run()
-                        Score.salvar_score(pontos)
+
+                        lista_atual = Score.get_high_score()
+
+                        if len(lista_atual) < 10 or (len(lista_atual) > 0 and pontos > lista_atual[-1][1]):
+                            nome_jogador =Score.input_nome(self.window)
+                            Score.salvar_score(nome_jogador, pontos)
+                        else:
+
+                            # --- TELA DE GAME OVER ---
+                            self.window.fill((0, 0, 0)) # Fundo preto
+                            fonte = pygame.font.SysFont('Arial', 50, bold=True)
+                            
+                            # Criar os textos
+                            texto_game_over = fonte.render("GAME OVER!", True, (255, 0, 0))
+                            texto_score = fonte.render(f"Score Final: {pontos}", True, (255, 255, 255))
+                            
+                            # Centralizar e desenhar na tela
+                            rect_go = texto_game_over.get_rect(center=(self.window.get_width()/2, self.window.get_height()/2 - 30))
+                            rect_sc = texto_score.get_rect(center=(self.window.get_width()/2, self.window.get_height()/2 + 40))
+                            
+                            self.window.blit(texto_game_over, rect_go)
+                            self.window.blit(texto_score, rect_sc)
+                            
+                            pygame.display.flip() # Atualiza a tela para mostrar o texto
+                            
+                            # Esperar 3 segundos (3000 milissegundos)
+                            pygame.time.wait(3000)
+                        
+                        # Salvar e voltar
                         self.estado = 'MENU'
 
-                        self.estado = "LEVEL"
                     elif escolha == 'RECORDES':
                         Score.mostrar_score(self.window)
+                        self.estado = 'MENU'
 
                     elif escolha == "SAIR" or escolha == None:
-                        running = False
-
-            
+                        running = False            
     
                 pygame.display.flip()
-                self.clock.tick(60) 
-            
+                self.clock.tick(60)             
             
             pygame.quit()
-            sys.exit()           
+            sys.exit()   

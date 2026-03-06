@@ -8,7 +8,6 @@ from code.Background import Background
 from code.EntityFactory import EntityFactory
 from code.Constante import COR_AMARELA, COR_VERDE, COR_PRETA, OFFSETS_BORDA
 
-
 class Level:
     def __init__(self, window, name):
         self.window = window
@@ -43,8 +42,7 @@ class Level:
         if self.player: self.entity_list.append(self.player)
 
         self.timer_spawn = 0
-        self.spawn_delay = 1500
-        
+        self.spawn_delay = 1500        
 
     def draw_text_with_outline(self, text, color, x, y):
         outline_color = (COR_PRETA)
@@ -60,16 +58,19 @@ class Level:
         text_rect = text_surf.get_rect(center=(x, y))
         self.window.blit(text_surf, text_rect)
 
-        # fonte_hud = pygame.font.SysFont('Arial', 30, bold=True)
-        # texto_surf = fonte_hud.render(f"PONTOS: {self.pontuacao}", True, (255, 255, 255))
-        # self.window.blit(texto_surf, (20, 20)) # Desenha no canto superior esquerdo
     def draw_hud(self):
         fonte_hud = pygame.font.SysFont('Arial', 30, bold=True)
         texto_surf = fonte_hud.render(f"PONTOS: {self.score}", True, (255, 255, 255))
         self.window.blit(texto_surf, (20, 20)) # Desenha no canto superior esquerdo
+
+
         if hasattr(self, 'recorde_atual'):
-            rec_surf = fonte_hud.render(f"RECORDE: {self.recorde_atual}", True, (255, 215, 0))
+            lista_scores = Score.get_high_score()
+            melhor_valor = lista_scores[0][1] if lista_scores else 0
+
+            rec_surf = fonte_hud.render(f"RECORDE: {melhor_valor}", True, (255, 215, 0))
             self.window.blit(rec_surf, (20, 60))
+
     def run(self, ):
         clock = pygame.time.Clock()
         self.som_contagem.play()
@@ -78,6 +79,7 @@ class Level:
             clock.tick(60)
             agora = pygame.time.get_ticks()
 
+            # --- LÓGICA DE CONTAGEM REGRESSIVA ---
             if not self.corrida_iniciada:
                 if agora - self.timer_iniciar >= 1000:
                     self.contagem_regressiva -= 1
@@ -92,7 +94,7 @@ class Level:
                 if agora - self.go_timer >= 1000:
                     pygame.mixer.music.play(-1)
 
-            # Eventos Parte 1
+            # Eventos
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -106,52 +108,57 @@ class Level:
                         else:
                             pygame.mixer.music.unpause()
 
-            # Evento Parte 2 Logica de movimento
+            # --- LÓGICA DO JOGO (MOVIMENTO E COLISÃO) ---
             if not self.pausado:               
                 if self.corrida_iniciada and self.player:
                     self.player.move()
 
-                # Movimentação das CPUs e Fundo
-                for ent in self.entity_list: # Move o NPC
-                    # Se for o Fundo ou um Carro da CPU, eles dependem da velocidade do Player
-                    if isinstance(ent, Background) or isinstance(ent, Traffic):
-                        ent.move(self.player.current_speed)
+                    # 2. MOVIMENTAÇÃO DE ENTIDADES (CPU E FUNDO)
+                    for ent in self.entity_list: # Move o NPC
+                        # Se for o Fundo ou um Carro da CPU, eles dependem da velocidade do Player
+                        if isinstance(ent, Background) or isinstance(ent, Traffic):
+                            ent.move(self.player.current_speed)
 
-                # Spaw de veículos
-                if self.corrida_iniciada:
-                    agora = pygame.time.get_ticks()
-                    tempo_decorrida = agora - self.go_timer # Tempo desde o  GO
-                    if tempo_decorrida > 3000:
-                        if agora - self.timer_spawn > self.spawn_delay:
-                            tipo_sorteado = random.choice(['carro-caminhao', 'carro-lento', 'carro-padrao', 'carro-esportivo'])
-                            novo_inimigo = EntityFactory.get_entity(tipo_sorteado)
-                            if novo_inimigo:
-                                self.entity_list.append(novo_inimigo)                            
-                            self.timer_spawn = agora
+                    # 1. CHECAR COLISÃO (NOVO!)
+                    if self.detectar_colisoes():
+                        print(f"GAME OVER! Score Final: {self.score}")
+                        pygame.mixer.music.stop()
+                        return self.score # Sai do Level e volta para o Game/Menu
 
-                # Você precisa chamar o move() deles passando a velocidade do player
-                for ent in self.entity_list:
-                    if isinstance(ent, Traffic):
-                        ent.move(self.player.current_speed)
-                    elif isinstance(ent, Background):
-                        ent.move(self.player.current_speed)
+                    
+                    # 3. SPAWN DE VEÍCULOS
+                    if self.corrida_iniciada:
+                        agora = pygame.time.get_ticks()
+                        tempo_decorrida = agora - self.go_timer # Tempo desde o  GO
+                        if tempo_decorrida > 3000:
+                            if agora - self.timer_spawn > self.spawn_delay:
+                                tipo_sorteado = random.choice(['carro-caminhao', 'carro-lento', 'carro-padrao', 'carro-esportivo'])
+                                novo_inimigo = EntityFactory.get_entity(tipo_sorteado)
+                                if novo_inimigo:
+                                    self.entity_list.append(novo_inimigo)                            
+                                self.timer_spawn = agora
 
-                #for ent in self.entity_list:
-                    #if isinstance(ent, Traffic) and ent.rect.y >= 1200:
-                        #self.score += 10
-                for ent in self.entity_list:
-                    # Verifica se é um carro da CPU (Traffic) e se ele passou do limite
-                    if isinstance(ent, Traffic) and ent.rect.y >= 1200:
-                        self.score += 100  # Aumenta para 100 pontos como você pediu
-                        #ent.kill()        # Remove o carro da lista na HORA para não contar ponto de novo
-                        print(f"Score atual: {self.score}")
+                    # Você precisa chamar o move() deles passando a velocidade do player
+                    for ent in self.entity_list:
+                        if isinstance(ent, Traffic):
+                            ent.move(self.player.current_speed)
+                        elif isinstance(ent, Background):
+                            ent.move(self.player.current_speed)
 
-                # Limpeza da lista
-                self.entity_list = [ent for ent in self.entity_list if not isinstance(ent, Traffic) or ent.rect.y < 1200]
-            
-            # Desenho
+                    # 4. SISTEMA de PONTUAÇÃO (Quando o carro sai da tela embaixo)       
+                    for ent in self.entity_list:
+                        # Verifica se é um carro da CPU (Traffic) e se ele passou do limite
+                        if isinstance(ent, Traffic) and ent.rect.y >= 1200:
+                            self.score += 10  # Aumenta para 10 pontos como você pediu
+                            print(f"Score atual: {self.score}")
+
+                    # 5 Limpeza da lista
+                    self.entity_list = [ent for ent in self.entity_list if not isinstance(ent, Traffic) or ent.rect.y < 1200]
+                
+            # --- DESENHO (RENDERIZAÇÃO) ---
             self.window.fill((0, 0, 0))
 
+            # Desenha todas as entidades da lista
             for ent in self.entity_list:
                 if hasattr(ent, 'draw'):
                     ent.draw(self.window)
@@ -159,11 +166,13 @@ class Level:
                     self.window.blit(ent.surf, ent.rect)
 
             self.draw_hud()
-            # Lógica do texto piscante
+
+            # Efeito visual de texto piscante
             if agora - self.timer_piscar > 500:
                 self.mostrar_texto = not self.mostrar_texto
                 self.timer_piscar = agora
 
+            # Desenha Contagem Regressiva ou "GO!"
             mostrar_go = self.corrida_iniciada and (agora - self.go_timer < 1000)
 
             if (not self.corrida_iniciada or mostrar_go) and self.mostrar_texto:
@@ -173,7 +182,7 @@ class Level:
                 
                 self.draw_text_with_outline(texto_str, cor, self.window.get_width()/2, self.window.get_height()/2)
             
-           # --- MENSAGEM DE PAUSE (Desenha por cima de tudo) ---
+           # --- Tela de Pause ---
             if self.pausado:
                 # Opcional: Escurece a tela ao pausar
                 overlay = pygame.Surface(self.window.get_size(), pygame.SRCALPHA)
@@ -184,4 +193,20 @@ class Level:
 
             pygame.display.flip()
 
-        #return self.score
+    def detectar_colisoes(self):
+        for ent in self.entity_list:
+            # 1. Ignorar se for o próprio jogador
+            if ent == self.player:
+                continue
+            
+            # 2. Ignorar se for o Fundo (Background)
+            # Verifique se a classe se chama 'Background' no seu código
+            if isinstance(ent, Background):
+                continue
+            # 3. SÓ CHECA COLISÃO SE FOR UM CARRO DA CPU (Traffic)
+            if isinstance(ent, Traffic):
+                # O collide_mask só retorna algo se os pixels REAIS se tocarem
+                if pygame.sprite.collide_mask(self.player, ent):
+                    print(f"COLISÃO REAL COM: {ent.name}") # Debug para o terminal
+                    return True
+        return False
