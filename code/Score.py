@@ -11,22 +11,26 @@ class Score:
         self.window = window
 
     @staticmethod
-    def salvar_score(pontuacao_final):
+    def get_high_score():
         arquivo = 'highscore.text'
-        recorde = 0
-        # Lê o recorde atual
         try:
             with open(arquivo, 'r') as f:
                 conteudo = f.read().strip()
-                if conteudo: recorde = int(conteudo)
+                return int(conteudo) if conteudo else 0
         except (FileNotFoundError, ValueError):
-            recorde = 0
+            return 0
+
+    @staticmethod
+    def salvar_score(pontuacao_final):
+        arquivo = 'highscore.text'
+        recorde = 0
 
         # Se os pontos forem maior que 0, salva o arquivo
         if pontuacao_final > recorde:
             with open(arquivo, 'w') as f:
                 f.write(str(pontuacao_final))
             print(f"Novo recorde salvo: {pontuacao_final}!")
+    
 
     @staticmethod
     def mostrar_score(window):

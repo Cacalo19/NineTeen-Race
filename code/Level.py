@@ -2,6 +2,7 @@ import random
 
 import pygame
 
+from code.Score import Score
 from code.Traffic import Traffic
 from code.Background import Background
 from code.EntityFactory import EntityFactory
@@ -27,6 +28,8 @@ class Level:
         pygame.mixer_music.load('./asset/som/neon_sign_circuit_bpm145.ogg')
 
         self.pontuacao = 0
+        self.score = 0
+        self.recorde_atual = Score.get_high_score()
 
         try:
             self.fonte_contagem = pygame.font.Font('./asset/fonte/PressStart2P-Regular.ttf', 80)
@@ -41,7 +44,7 @@ class Level:
 
         self.timer_spawn = 0
         self.spawn_delay = 1500
-        self.score = 0
+        
 
     def draw_text_with_outline(self, text, color, x, y):
         outline_color = (COR_PRETA)
@@ -57,11 +60,16 @@ class Level:
         text_rect = text_surf.get_rect(center=(x, y))
         self.window.blit(text_surf, text_rect)
 
+        # fonte_hud = pygame.font.SysFont('Arial', 30, bold=True)
+        # texto_surf = fonte_hud.render(f"PONTOS: {self.pontuacao}", True, (255, 255, 255))
+        # self.window.blit(texto_surf, (20, 20)) # Desenha no canto superior esquerdo
+    def draw_hud(self):
         fonte_hud = pygame.font.SysFont('Arial', 30, bold=True)
-        texto_surf = fonte_hud.render(f"PONTOS: {self.pontuacao}", True, (255, 255, 255))
+        texto_surf = fonte_hud.render(f"PONTOS: {self.score}", True, (255, 255, 255))
         self.window.blit(texto_surf, (20, 20)) # Desenha no canto superior esquerdo
-        
-
+        if hasattr(self, 'recorde_atual'):
+            rec_surf = fonte_hud.render(f"RECORDE: {self.recorde_atual}", True, (255, 215, 0))
+            self.window.blit(rec_surf, (20, 60))
     def run(self, ):
         clock = pygame.time.Clock()
         self.som_contagem.play()
@@ -150,6 +158,7 @@ class Level:
                 else:
                     self.window.blit(ent.surf, ent.rect)
 
+            self.draw_hud()
             # Lógica do texto piscante
             if agora - self.timer_piscar > 500:
                 self.mostrar_texto = not self.mostrar_texto
