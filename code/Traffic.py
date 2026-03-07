@@ -36,8 +36,7 @@ class Traffic(Entity):
 
                         # Logica de checagem Lateral
                         direcao = 0                                               
-                        #if self.rect.x <= 210: self.rect.x += passo_lateral
-                        #elif self.rect.right >= 660: self.rect.x -= passo_lateral
+
                         if self.rect.x <= 210: direcao = 1
                         elif self.rect.right >= 660: direcao = -1
                         else:direcao = -1 if self.rect.centerx < outro.rect.centerx else 1
@@ -56,12 +55,6 @@ class Traffic(Entity):
                         else:
                             self.speed *= 0.98
 
-                        # else:
-                        #     if self.rect.centerx < outro.rect.centerx:
-                        #         self.rect.x -= passo_lateral
-                        #     else:
-                        #         self.rect.x += passo_lateral
-                        
                         break # Encontrou um obstáculo, não precisa checar o resto da lista
 
         # --- LÓGICA DE RECUPERAÇÃO DE VELOCIDADE ---

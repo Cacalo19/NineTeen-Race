@@ -26,12 +26,11 @@ class EntityFactory:
             random.shuffle(faixas_possiveis)
             x_selecionado = None
 
-            #for faixa in faixas_x:
             for faixa in faixas_possiveis:
                 ocupada = False
                 for ent in current_entities:
                     if hasattr(ent, 'rect'):
-                        #if ent.rect.x == faixa and ent.rect.y < 250:
+ 
                         if abs(ent.rect.x - faixa) < 20 and ent.rect.y < 250:
                             ocupada = True
                             break
@@ -68,7 +67,8 @@ class EntityFactory:
                 return Traffic(asset, posicao_final, speed=VELOCIDADE_VEICULOS['carro-esportivo'])
             case 'carro-emergencia':
                 asset = random.choice(VEICULOS_ASSETS['carro-emergencia'])
-                return Traffic(asset, posicao_final, speed =VELOCIDADE_VEICULOS['carro-emergencia'])
-            #case 'carro-quebrado':
-                #return Traffic('carro_lento1', posicao_final, speed=VELOCIDADE_VEICULOS['carro-quebrado'])
+                return Traffic(asset, posicao_final, speed =VELOCIDADE_VEICULOS['carro-parado'])
+            case 'carro-preso':
+                asset = random.choice(VEICULOS_ASSETS['carro-preso'])
+                return Traffic(asset, posicao_final, speed=VELOCIDADE_VEICULOS['carro-parado'])
         return None

@@ -153,9 +153,10 @@ class Level:
                     if self.corrida_iniciada:
                         if agora - self.timer_spawn > self.spawn_delay:
                             chance = random.randint(1, 10)
-                            if chance <= 3: # 10% de chance de ser um obstáculo parado
-                                
-                                tipo_sorteado = random.choice(['carro-emergencia'])
+
+                            if chance <= 3: # 10% de chance de ser um obstáculo parado                                
+                                #tipo_sorteado = random.choice(['carro-emergencia'])
+                                tipo_sorteado = 'carro-emergencia'
                             else:                        
                                 tipo_sorteado = random.choice(['carro-caminhao', 'carro-lento', 'carro-padrao', 'carro-esportivo'])
                                 
@@ -163,6 +164,28 @@ class Level:
                             
                             if novo_inimigo:
                                 self.entity_list.append(novo_inimigo)
+
+                            # --- LÓGICA DE PARCEIRO DE ACOSTAMENTO ---
+                            if tipo_sorteado == 'carro-emergencia':
+                                # Posição logo à frente da viatura
+                                x_do_acostamento = novo_inimigo.rect.x
+                                #posicao_parceiro = (novo_inimigo.rect.x, novo_inimigo.rect.y - 180)
+                                posicao_parceiro = (x_do_acostamento, novo_inimigo.rect.y - 180)
+                                
+                                # Identifica se é polícia (emergencia2) ou socorro (1 e 3)
+                                if novo_inimigo.name == 'carro_emergencia2':
+                                    tipo_parceiro = 'carro-preso'
+                                else:
+                                    tipo_parceiro = random.choice(['carro-lento', 'carro-padrao', 'carro-esportivo'])
+                                
+                                # Cria o segundo carro parado
+                                parceiro = EntityFactory.get_entity(tipo_parceiro, posicao_parceiro, self.entity_list)
+                                if parceiro:
+                                    parceiro.speed = 0 # Garante que fique parado
+                                    parceiro.rect.x = x_do_acostamento
+                                    self.entity_list.append(parceiro)
+                            # ------------------------------------------
+
                             self.timer_spawn = agora
 
                     # 4. CHECAR COLISÃO

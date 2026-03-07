@@ -28,11 +28,11 @@ VEICULOS_ASSETS ={
     'carro-caminhao' : ['carro_caminhao'],
     'carro-lento' : ['carro_lento1', 'carro_lento2', 'carro_lento3', 'carro_lento4', 'carro_lento5', 'carro_lento6', 'carro_lento7', 'carro_lento8'],
     'carro-padrao' : ['carro_padrao1', 'carro_padrao2', 'carro_padrao3', 'carro_padrao4', 'carro_padrao5', 'carro_padrao6', 'carro_padrao7', 'carro_padrao8', 'carro_padrao9', 'carro_padrao10'],
-    'carro-esportivo' : ['carro_esportivo1', 'carro_esportivo2', 'carro_esportivo3', 'carro_esportivo4', 'carro_esportivo5']
-
+    'carro-esportivo' : ['carro_esportivo1', 'carro_esportivo2', 'carro_esportivo3', 'carro_esportivo4', 'carro_esportivo5'],
+    'carro-preso' : ['carro_preso1', 'carro_preso2', 'carro_preso3']
 }
 VELOCIDADE_VEICULOS = {
-    'carro-emergencia' : 0,
+    'carro-parado' : 0,
     'carro-quebrado' : 0,
     'carro-caminhao' : 20,
     'carro-lento' : 25,
