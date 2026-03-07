@@ -10,27 +10,35 @@ from code.Player import Player
 class EntityFactory:
 
     @staticmethod
-    def get_entity(entity_name: str, position=(0, 0)):
+    def get_entity(entity_name: str, position=(0, 0), current_entities=[]):
 
-        # faixas_x = [200, 340, 460, 600]
-        # x_centralizado = random.choice(faixas_x)
-        # y_topo = -150 # Spawn acima da tela no eicho y
+        faixas_x = [200, 340, 460, 600]
+        y_spawn = position[1] if position[1] != 0 else -150
 
-        # posicao_final = (x_centralizado, y_topo)
-        ### Inicio do teste ###
         if entity_name.startswith('carro'):
-            faixas_x = [200, 340, 460, 600]
-            x_escolhido = random.choice(faixas_x)
-            
-            # Se a posição enviada for (0,0), usamos o spawn padrão acima da tela
-            # Se enviamos algo como (x, -200) do Level.py, usamos o que foi enviado
-            y_spawn = position[1] if position[1] != 0 else -150
-            x_spawn = position[0] if position[0] != 0 else x_escolhido
-            
-            posicao_final = (x_spawn, y_spawn)
+
+            random.shuffle(faixas_x)
+            x_selecionado = None
+
+            for faixa in faixas_x:
+                ocupada = False
+                for ent in current_entities:
+                    if hasattr(ent, 'rect'):
+                        if ent.rect.x == faixa and ent.rect.y < 250:
+                            ocupada = True
+                            break
+                
+                if not ocupada:
+                    x_selecionado = faixa
+                    break
+
+            if x_selecionado is None:
+                return None
+                      
+            posicao_final = (x_selecionado, y_spawn)
         else:
             posicao_final = position
-        ### Fim do teste ###
+
         match entity_name:
             case 'Level1':
                 return Background('pista1', position)

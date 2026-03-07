@@ -140,7 +140,7 @@ class Level:
                         nova_lista.append(ent)
                     
                     self.entity_list = nova_lista
-                    ## MODIFICADO TESTE ##
+
                     # --- LÓGICA DE DIFICULDADE (AJUSTE DINÂMICO) ---
                     if self.score > 200:
                         self.spawn_delay = 500  # 2 carros por segundo (mais difícil)
@@ -154,31 +154,17 @@ class Level:
                         if agora - self.timer_spawn > self.spawn_delay:
                             tipo_sorteado = random.choice(['carro-caminhao', 'carro-lento', 'carro-padrao', 'carro-esportivo'])
                             
-                            # Sorteia um X (ajuste os números para as suas faixas de pista)
-                            x_aleatorio = random.randint(150, 600) 
-                            
-                            # O SEGREDO: Y = -200 para não dar "pop" na tela
-                            novo_inimigo = EntityFactory.get_entity(tipo_sorteado, (x_aleatorio, -200))
+                            novo_inimigo = EntityFactory.get_entity(tipo_sorteado, (0, -200), self.entity_list)
                             
                             if novo_inimigo:
                                 self.entity_list.append(novo_inimigo)
                             self.timer_spawn = agora
-                    ## FIM ##
-                    # # 3. SPAWN DE VEÍCULOS
-                    # if agora - self.timer_spawn > self.spawn_delay:
-                    #     tipo_sorteado = random.choice(['carro-caminhao', 'carro-lento', 'carro-padrao', 'carro-esportivo'])
-                    #     novo_inimigo = EntityFactory.get_entity(tipo_sorteado)
-                    #     if novo_inimigo:
-                    #         self.entity_list.append(novo_inimigo)
-                    #     self.timer_spawn = agora
 
                     # 4. CHECAR COLISÃO
                     if self.detectar_colisoes():
                         print(f"GAME OVER! Score Final: {self.score}")
                         pygame.mixer.music.stop()
-                        return self.score
-
-                    
+                        return self.score                  
                 
             # --- DESENHO (RENDERIZAÇÃO) ---
             self.window.fill((0, 0, 0))
