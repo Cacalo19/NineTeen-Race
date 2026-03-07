@@ -1,7 +1,7 @@
 import random
 from re import match
 
-from code.Constante import VELOCIDADE_VEICULOS, WINDOW_HEIGHT
+from code.Constante import VEICULOS_ASSETS, VELOCIDADE_VEICULOS, WINDOW_HEIGHT
 from code.Traffic import Traffic
 from code.Background import Background
 from code.Player import Player
@@ -15,16 +15,24 @@ class EntityFactory:
         faixas_x = [200, 340, 460, 600]
         y_spawn = position[1] if position[1] != 0 else -150
 
-        if entity_name.startswith('carro'):
+        acostamento = [129, 670]
 
-            random.shuffle(faixas_x)
+        if entity_name.startswith('carro'):
+            if entity_name in ['carro-emergencia']:
+                faixas_possiveis = acostamento.copy()
+            else:
+                faixas_possiveis = faixas_x.copy()
+
+            random.shuffle(faixas_possiveis)
             x_selecionado = None
 
-            for faixa in faixas_x:
+            #for faixa in faixas_x:
+            for faixa in faixas_possiveis:
                 ocupada = False
                 for ent in current_entities:
                     if hasattr(ent, 'rect'):
-                        if ent.rect.x == faixa and ent.rect.y < 250:
+                        #if ent.rect.x == faixa and ent.rect.y < 250:
+                        if abs(ent.rect.x - faixa) < 20 and ent.rect.y < 250:
                             ocupada = True
                             break
                 
@@ -47,15 +55,20 @@ class EntityFactory:
             
             # Veículos da CPU
             case 'carro-caminhao':
-                #return Traffic('carro_caminhao', position(WINDOW_HEIGHT - 1, random.randint(130, 710)), speed=VELOCIDADE_VEICULOS['carro-caminhao'])
-                return Traffic('carro_caminhao', posicao_final, speed=VELOCIDADE_VEICULOS['carro-caminhao'])
+                asset = random.choice(VEICULOS_ASSETS['carro-caminhao'])
+                return Traffic(asset, posicao_final, speed=VELOCIDADE_VEICULOS['carro-caminhao'])
             case 'carro-lento':
-                #return Traffic('carro_lento1', position(WINDOW_HEIGHT - 1, random.randint(130, 710)), speed=VELOCIDADE_VEICULOS['carro-lento'])
-                return Traffic('carro_lento1', posicao_final, speed=VELOCIDADE_VEICULOS['carro-lento'])
+                asset = random.choice(VEICULOS_ASSETS['carro-lento'])
+                return Traffic(asset, posicao_final, speed=VELOCIDADE_VEICULOS['carro-lento'])
             case 'carro-padrao':
-                #return Traffic('carro_padrao1', position(WINDOW_HEIGHT - 1, random.randint(130, 710)), speed=VELOCIDADE_VEICULOS['carro-padrao'])
-                return Traffic('carro_padrao1', posicao_final, speed=VELOCIDADE_VEICULOS['carro-padrao'])
+                asset = random.choice(VEICULOS_ASSETS['carro-padrao'])
+                return Traffic(asset, posicao_final, speed=VELOCIDADE_VEICULOS['carro-padrao'])
             case 'carro-esportivo':
-                #return Traffic('carro_esportivo1', position(WINDOW_HEIGHT - 1, random.randint(130, 710)), speed=VELOCIDADE_VEICULOS['carro-esportivo'])
-                return Traffic('carro_esportivo1', posicao_final, speed=VELOCIDADE_VEICULOS['carro-esportivo'])
+                asset = random.choice(VEICULOS_ASSETS['carro-esportivo'])
+                return Traffic(asset, posicao_final, speed=VELOCIDADE_VEICULOS['carro-esportivo'])
+            case 'carro-emergencia':
+                asset = random.choice(VEICULOS_ASSETS['carro-emergencia'])
+                return Traffic(asset, posicao_final, speed =VELOCIDADE_VEICULOS['carro-emergencia'])
+            #case 'carro-quebrado':
+                #return Traffic('carro_lento1', posicao_final, speed=VELOCIDADE_VEICULOS['carro-quebrado'])
         return None

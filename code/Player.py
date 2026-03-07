@@ -1,5 +1,7 @@
 import pygame
 from code.Entity import Entity
+from code.Background import Background
+from code.Traffic import Traffic
 
 class Player(Entity):
     def __init__(self, name: str, position: tuple):
@@ -7,7 +9,7 @@ class Player(Entity):
         self.vel_horizontal = 5
         self.is_acelerando = False 
         self.current_speed = 0 # Começa parado
-        self.max_speed = 40   # Velocidade maxima
+        self.max_speed = 45   # Velocidade maxima
         self.acelerando = 0.25 # Quanho de velocidade
         self.freiando = 0.4
 
@@ -37,3 +39,21 @@ class Player(Entity):
         # Impede o carro de sair pela direita (ajuste 600 para a largura da sua pista)
         if self.rect.right > 710:
             self.rect.right = 685
+
+    def detectar_colisoes(self, entity_list):
+        for ent in entity_list:
+            # 1. Ignorar se for o próprio jogador
+            if ent == self:
+                continue
+            
+            # 2. Ignorar se for o Fundo (Background)
+            # Verifique se a classe se chama 'Background' no seu código
+            if isinstance(ent, Background):
+                continue
+            # 3. SÓ CHECA COLISÃO SE FOR UM CARRO DA CPU (Traffic)
+            if isinstance(ent, Traffic):
+                # O collide_mask só retorna algo se os pixels REAIS se tocarem
+                if pygame.sprite.collide_mask(self, ent):
+                    print(f"COLISÃO REAL COM: {ent.name}") # Debug para o terminal
+                    return True
+        return False

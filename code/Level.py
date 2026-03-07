@@ -152,8 +152,13 @@ class Level:
                     # 3. SPAWN DE VEÍCULOS
                     if self.corrida_iniciada:
                         if agora - self.timer_spawn > self.spawn_delay:
-                            tipo_sorteado = random.choice(['carro-caminhao', 'carro-lento', 'carro-padrao', 'carro-esportivo'])
-                            
+                            chance = random.randint(1, 10)
+                            if chance <= 3: # 10% de chance de ser um obstáculo parado
+                                
+                                tipo_sorteado = random.choice(['carro-emergencia'])
+                            else:                        
+                                tipo_sorteado = random.choice(['carro-caminhao', 'carro-lento', 'carro-padrao', 'carro-esportivo'])
+                                
                             novo_inimigo = EntityFactory.get_entity(tipo_sorteado, (0, -200), self.entity_list)
                             
                             if novo_inimigo:
@@ -161,7 +166,7 @@ class Level:
                             self.timer_spawn = agora
 
                     # 4. CHECAR COLISÃO
-                    if self.detectar_colisoes():
+                    if self.player.detectar_colisoes(self.entity_list):
                         print(f"GAME OVER! Score Final: {self.score}")
                         pygame.mixer.music.stop()
                         return self.score                  
@@ -203,21 +208,3 @@ class Level:
                 self.draw_text_with_outline("PAUSADO", (255, 255, 255), self.window.get_width()/2, self.window.get_height()/2)
 
             pygame.display.flip()
-
-    def detectar_colisoes(self):
-        for ent in self.entity_list:
-            # 1. Ignorar se for o próprio jogador
-            if ent == self.player:
-                continue
-            
-            # 2. Ignorar se for o Fundo (Background)
-            # Verifique se a classe se chama 'Background' no seu código
-            if isinstance(ent, Background):
-                continue
-            # 3. SÓ CHECA COLISÃO SE FOR UM CARRO DA CPU (Traffic)
-            if isinstance(ent, Traffic):
-                # O collide_mask só retorna algo se os pixels REAIS se tocarem
-                if pygame.sprite.collide_mask(self.player, ent):
-                    print(f"COLISÃO REAL COM: {ent.name}") # Debug para o terminal
-                    return True
-        return False
