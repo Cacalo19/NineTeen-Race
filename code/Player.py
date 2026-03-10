@@ -14,9 +14,9 @@ class Player(Entity):
         self.freiando = 0.3 # Frenagem.
 
         # Configuração do som do motor em loop.
-        self.som_motor = pygame.mixer.Sound('./asset/som/loop_5.wav')
+        self.som_motor = pygame.mixer.Sound('./asset/som/engine-loop-1.wav')
         self.canal_motor = pygame.mixer.Channel(0)
-        self.volume_motor = 0.5
+        self.volume_motor = 0.1
         self.canal_motor.play(self.som_motor, loops=-1)        
         self.canal_motor.set_volume(self.volume_motor)
 
@@ -28,8 +28,8 @@ class Player(Entity):
             self.is_aceleracao= True
             if self.velocidade_atual < self.velocidade_maxima:
                 self.velocidade_atual += self.aceleracao
-            if self.volume_motor < 0.9:  # 0.8 é o volume máximo (ajuste como preferir).
-                self.volume_motor += 0.05
+            if self.volume_motor < 1:  # 0.8 é o volume máximo (ajuste como preferir).
+                self.volume_motor += 0.1
 
         else: # Desaceleração gradual quando solta a tecla.
             self.is_aceleracao = False
@@ -38,8 +38,8 @@ class Player(Entity):
             else:
                 self.velocidade_atual = 0
 
-            if self.volume_motor > 0.2:  # 0.1 é o som do motor ligado, mas parado.
-                self.volume_motor -= 0.05
+            if self.volume_motor > 0.1:  # 0.1 é o som do motor ligado, mas parado.
+                self.volume_motor -= 0.1
         self.canal_motor.set_volume(self.volume_motor)
         
         # Movimentação Lateral
