@@ -11,13 +11,13 @@ reflexos são a chave para a sobrevivência!
 
 📸 Screenshots
 
-<img width="840" height="1251" alt="Captura de tela 2026-03-10 161757" src="https://github.com/user-attachments/assets/e6868038-d083-45b5-a201-59d0fb44c216" />
+<img width="300" height="451" alt="Captura de tela 2026-03-10 161757" src="https://github.com/user-attachments/assets/e6868038-d083-45b5-a201-59d0fb44c216" />
 
-<img width="841" height="1261" alt="Captura de tela 2026-03-10 161855" src="https://github.com/user-attachments/assets/3d38107c-f22e-4d4c-8070-141004a0041a" />
+<img width="300" height="451" alt="Captura de tela 2026-03-10 161855" src="https://github.com/user-attachments/assets/3d38107c-f22e-4d4c-8070-141004a0041a" />
 
-<img width="837" height="1261" alt="Captura de tela 2026-03-10 161920" src="https://github.com/user-attachments/assets/fc74ae83-3d58-4392-9a20-21447067e26b" />
+<img width="300" height="451" alt="Captura de tela 2026-03-10 161920" src="https://github.com/user-attachments/assets/fc74ae83-3d58-4392-9a20-21447067e26b" />
 
-<img width="838" height="1261" alt="Captura de tela 2026-03-10 161938" src="https://github.com/user-attachments/assets/05c7f445-1c79-42b3-ace8-1b4a82e3c247" />
+<img width="300" height="451" alt="Captura de tela 2026-03-10 161938" src="https://github.com/user-attachments/assets/05c7f445-1c79-42b3-ace8-1b4a82e3c247" />
 
 ✨ Funcionalidades Implementadas
 Tráfego Dinâmico: Carros com diferentes padrões de velocidade e IA de desvio.
