@@ -20,17 +20,18 @@ reflexos são a chave para a sobrevivência!
 <img width="300" height="451" alt="Captura de tela 2026-03-10 161938" src="https://github.com/user-attachments/assets/05c7f445-1c79-42b3-ace8-1b4a82e3c247" />
 
 ✨ Funcionalidades Implementadas
-Tráfego Dinâmico: Carros com diferentes padrões de velocidade e IA de desvio.
+-Tráfego Dinâmico: Carros com diferentes padrões de velocidade e IA de desvio.
 
-Eventos de Acostamento:: Inclusão de viaturas de polícia no acostamento.
+-Eventos de Acostamento:: Inclusão de viaturas de polícia no acostamento.
 
-Animação de Explosão: Sequência de frames personalizada ao colidir com qualquer entidade.
+-Animação de Explosão: Sequência de frames personalizada ao colidir com qualquer entidade.
 
-Dificuldade Progressiva: O ritmo de surgimento dos carros aumenta conforme o seu score.
+-Dificuldade Progressiva: O ritmo de surgimento dos carros aumenta conforme o seu score.
 
-HUD Experimental: Interface básica com placar e mensagens de status (Pausa/GO).
+-HUD Experimental: Interface básica com placar e mensagens de status (Pausa/GO).
 
 🕹️ Como Jogar (Demo)
+
 1 - Certifique-se de ter o Python instalado.
 
 2 - Instale o Pygame:
