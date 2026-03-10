@@ -36,6 +36,7 @@ reflexos são a chave para a sobrevivência!
 
 2 - Instale o Pygame:
       pip install pygame
+      
 3 - Execute o jogo:
       main.py
 
